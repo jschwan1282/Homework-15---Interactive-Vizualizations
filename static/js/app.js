@@ -63,14 +63,11 @@ function optionChanged(sampleID) {
 
     // // Sort the data array using the samples value
     // filter2.sort(function(a, b) {
-    //     return parseFloat(b.sample_values[0]) - parseFloat(a.sample_values[0]);
+    //     return parseFloat(b.sample_values) - parseFloat(a.sample_values);
     // });
 
-    // // Slice the first 10 objects for plotting
-    // filter2 = filter2.slice(0, 10);
-
-    // // // Reverse the array due to Plotly's defaults
-    // // filter2= filter2.reverse();
+    // // Reverse the array due to Plotly's defaults
+    // filter2 = filter2.reverse();
 
     //Create the plot for the sample values
     filter2.forEach((x) => {
@@ -82,16 +79,20 @@ function optionChanged(sampleID) {
             marker:{
             color: 'blue'
             },
-            x: x.sample_values,
-            y: x.otu_ids,
-            hovertext: x.otu_labels,
+            x: x.sample_values.slice(0, 10),
+            y: x.otu_ids.slice(0, 10),
+            hovertext: x.otu_labels.slice(0, 10),
             width: 20,
-            orientation: 'h'
+            orientation: 'h' 
         };
 
         var data = [trace];
+
+        var layout = {
+            title: "Top 10 OTUs",
+        }
         
-        Plotly.newPlot('bar', data);
+        Plotly.newPlot('bar', data, layout);
         var bubble_color=x.otu_ids;
         bubble_color = bubble_color.map(function(val){return val;});
 
@@ -108,20 +109,20 @@ function optionChanged(sampleID) {
 
         var data = [trace1];
 
-        var layout = {
+        var layout2 = {
             title: 'Belly Button Biodiversity',
         };
 
-        Plotly.newPlot('bubble', data, layout);
+        Plotly.newPlot('bubble', data, layout2);
 
         // variable to collect wash frequency
         var wfreq;
 
-        // wash frequency is collected from metadata
+        // Grab the wash frequwncy from the metadata
         filter1.forEach((d) => {
             wfreq = parseInt(d.wfreq);
 
-        // NaN or null to 0
+        // Change NaN or null values to 0
             wfreq = wfreq || 0;
             console.log(`wash freq: ${wfreq}`);
         });
@@ -142,10 +143,10 @@ function optionChanged(sampleID) {
             }
         ];
 
-var layout = {};
+var layout3 = {};
 
 
-Plotly.newPlot('gauge', data, layout);
+Plotly.newPlot('gauge', data, layout3);
 
 });
 
