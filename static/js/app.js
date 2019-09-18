@@ -48,7 +48,7 @@ function optionChanged(sampleID) {
         //create the rows and cells for the table
         Object.entries(d).forEach(([key, value]) => {
             var bb_row = table_h_bb.append("tr");
-            var bb_cell = bb_row.append("td").text(key.toUpperCase());
+            var bb_cell = bb_row.append("td").text(key.toLowerCase());
             var bb_cell = bb_row.append("td").text(value);
         });
 
@@ -60,29 +60,51 @@ function optionChanged(sampleID) {
             return x;
         }
     });
-
-    // // Sort the data array using the samples value
-    // filter2.sort(function(a, b) {
-    //     return parseFloat(b.sample_values) - parseFloat(a.sample_values);
-    // });
-
-    // // Reverse the array due to Plotly's defaults
-    // filter2 = filter2.reverse();
-
+    
     //Create the plot for the sample values
     filter2.forEach((x) => {
         console.log(x.sample_values);
         console.log(x.otu_ids);
 
+        // sort the data
+        var bsv = x.sample_values.slice(0);
+        var boid = x.otu_ids.slice(0);
+        var bol = x.otu_labels.slice(0);
+
+        // combine the arrays for sorting
+        var list = [];
+        for (var j = 0; j < boid.length; j++)
+            list.push({ 'bsv': bsv[j], 'boid': boid[j], 'bol': bol[j] });
+        
+        // console.log(list);
+        // sort descending by sample value
+        list.sort(function(a, b) {
+            return ((a.bsv > b.bsv) ? -1 : ((a.bsv == bsv.name) ? 0 : 1));
+        });
+
+        // console.log(list);
+
+        // put sorted data back
+        for (var k = 0; k < list.length; k++) {
+            bsv[k] = list[k].bsv;
+            boid[k] = `id:${list[k].boid.toString()}`;
+            bol[k] = list[k].bol;
+        }
+
+        // clean up labels for hover text, replace ; with <br>
+        var bol = bol.slice(0, 10);
+
+        for (var i = 0; i < bol.length; i++) {
+            bol[i] = bol[i].replace(/;/g, '<br>');
+        }
         var trace = {
             type: 'bar',
             marker:{
-            color: 'blue'
+            color: 'green'
             },
-            x: x.sample_values.slice(0, 10),
-            y: x.otu_ids.slice(0, 10),
-            hovertext: x.otu_labels.slice(0, 10),
-            width: 20,
+            x: bsv.slice(0, 10).reverse(),
+            y: boid.slice(0, 10),
+            hovertext: bol,
             orientation: 'h' 
         };
 
@@ -111,6 +133,9 @@ function optionChanged(sampleID) {
 
         var layout2 = {
             title: 'Belly Button Biodiversity',
+            xaxis: {
+                title: {
+                  text: 'OTU ID'}}
         };
 
         Plotly.newPlot('bubble', data, layout2);
