@@ -103,7 +103,7 @@ function optionChanged(sampleID) {
             color: 'green'
             },
             x: bsv.slice(0, 10).reverse(),
-            y: boid.slice(0, 10),
+            y: boid.slice(0, 10).reverse(),
             hovertext: bol,
             orientation: 'h' 
         };
